@@ -402,3 +402,6 @@ if __name__ == "__main__":
     score, conclusion = analyze_text_ai(test_text)
     print(f"Score: {score}, Conclusion: {conclusion}")
 
+
+
+
