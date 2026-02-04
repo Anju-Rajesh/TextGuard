@@ -401,7 +401,3 @@ if __name__ == "__main__":
     test_text = "This is a simple test string to verify the detector works."
     score, conclusion = analyze_text_ai(test_text)
     print(f"Score: {score}, Conclusion: {conclusion}")
-
-
-
-
