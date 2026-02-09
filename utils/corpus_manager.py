@@ -1,9 +1,5 @@
 import os
 
-
-
-
-
 CORPUS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'corpus')
 
 def load_corpus():
