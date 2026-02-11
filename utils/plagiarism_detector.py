@@ -9,7 +9,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 
-
 # Ensure NLTK data is available
 try:
     nltk.data.find('tokenizers/punkt')
