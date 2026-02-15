@@ -1,0 +1,202 @@
+:root {
+    --primary-color: #4cc9f0;
+    --secondary-color: #4895ef;
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --text-color: #f8f9fa;
+    --muted-text: #94a3b8;
+    --border-radius: 12px;
+    --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    --input-bg: #334155;
+    --input-border: #475569;
+}
+
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* Navbar */
+.navbar {
+    background-color: var(--card-bg);
+    box-shadow: var(--box-shadow);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--input-border);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.navbar-nav {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+}
+
+.navbar-nav a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.navbar-nav a:hover {
+    color: var(--primary-color);
+}
+
+/* Cards & Forms */
+.card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--input-border);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    box-sizing: border-box;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-family: inherit;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.2);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #0f172a;
+    /* Dark text on bright button for contrast */
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
+}
+
+/* Results Section */
+.result-box {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.percentage-circle {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 1rem 0;
+    color: var(--primary-color);
+}
+
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.badge-ai {
+    background-color: rgba(148, 163, 184, 0.1);
+    color: var(--muted-text);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.badge-human {
+    background-color: rgba(25, 135, 84, 0.2);
+    color: #51cf66;
+    border: 1px solid rgba(25, 135, 84, 0.3);
+}
+
+/* Alerts */
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.alert-danger {
+    background-color: rgba(148, 163, 184, 0.1);
+    color: var(--muted-text);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.alert-success {
+    background-color: rgba(25, 135, 84, 0.2);
+    color: #51cf66;
+    border: 1px solid rgba(25, 135, 84, 0.3);
+}
+
+.alert-info {
+    background-color: rgba(13, 202, 240, 0.2);
+    color: #3dd5f3;
+    border: 1px solid rgba(13, 202, 240, 0.3);
+}
+
+.alert-warning {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: #ffca2c;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}

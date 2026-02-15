@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="card" style="max-width: 400px; margin: 0 auto;">
+    <h2 style="text-align: center; margin-bottom: 2rem;">Create Account</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" required placeholder="Set your username">
+        </div>
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" name="email" id="email" required placeholder="Your email">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required placeholder="Choose a password">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+    </form>
+    <p style="text-align: center; margin-top: 1.5rem; color: var(--muted-text);">
+        Already have an account? <a href="{{ url_for('login') }}">Login here</a>
+    </p>
+</div>
+{% endblock %}

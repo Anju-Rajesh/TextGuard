@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Plagiarism Detection</h2>
+    <p style="color: var(--muted-text); margin-bottom: 2rem;">Analyze text to detect potential plagiarism against our
+        internal database.</p>
+
+    <div id="corpus" class="tab-content">
+        <p style="font-size: 0.9rem; color: var(--muted-text); margin-bottom: 1rem;">
+            Check your text against our internal database of source documents. Upload a file or paste text.
+        </p>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="corpus_check">
+
+            <div class="form-group">
+                <label for="corpus_text">Paste Text</label>
+                <textarea name="corpus_text" id="corpus_text" placeholder="Paste the text to check here..."
+                    rows="10"></textarea>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+                <label for="corpus_file">Or Upload .txt File</label>
+                <input type="file" name="corpus_file" id="corpus_file" accept=".txt" class="form-control"
+                    style="padding: 10px; border: 1px solid var(--border-color); width: 100%;">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">Check Against Corpus</button>
+        </form>
+
+        {% if corpus_results %}
+        <div class="result-box" style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 2rem;">
+            <h3>Plagiarism Analysis Report</h3>
+
+            <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem;">
+                <!-- Overall Score Circle -->
+                <div style="position: relative; width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 8px solid 
+                    {% if corpus_results.plagiarism_level == 'High' %} #ef4444
+                    {% elif corpus_results.plagiarism_level == 'Moderate' %} #f59e0b
+                    {% else %} #10b981 {% endif %};
+                    color:  {% if corpus_results.plagiarism_level == 'High' %} #ef4444
+                    {% elif corpus_results.plagiarism_level == 'Moderate' %} #f59e0b
+                    {% else %} #10b981 {% endif %};
+                    font-size: 2rem; font-weight: bold;">
+                    {{ corpus_results.overall_plagiarism_percentage }}%
+                </div>
+                <div>
+                    <h4 style="margin: 0; font-size: 1.5rem;">{{ corpus_results.plagiarism_level }} Plagiarism Detected
+                    </h4>
+                    <p style="color: var(--muted-text);">{{ corpus_results.message }}</p>
+                </div>
+            </div>
+
+            <h4>Matched Sources</h4>
+            {% if corpus_results.top_sources %}
+            <div class="sources-list" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                {% for source in corpus_results.top_sources %}
+                {% if source.similarity > 0 %}
+                <div class="source-item"
+                    style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h5 style="margin: 0 0 0.25rem 0; font-size: 1.1rem;">{{ source.source }}</h5>
+                        <p style="font-size: 0.85rem; color: var(--muted-text); margin: 0.5rem 0;">
+                            <strong>Matched Segment:</strong> <em>"{{ source.matched_segment }}"</em>
+                        </p>
+                        <span class="badge" style="font-size: 0.8rem; padding: 2px 8px; border-radius: 4px;
+                                    {% if source.plagiarism_level == 'High' %} background: #fee2e2; color: #991b1b;
+                                    {% elif source.plagiarism_level == 'Moderate' %} background: #fef3c7; color: #92400e;
+                                    {% else %} background: #d1fae5; color: #065f46; {% endif %}">
+                            {{ source.plagiarism_level }} Risk
+                        </span>
+                    </div>
+                    <div style="font-size: 1.2rem; font-weight: bold;">
+                        {{ source.similarity }}%
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No matches found in the corpus.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Padding for footer -->
+    <div style="height: 100px;"></div>
+
+</div>
+{% endblock %}

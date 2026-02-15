@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="card">
+    <h2>Text Similarity Detection</h2>
+    <p style="color: var(--muted-text); margin-bottom: 2rem;">Compare two pieces of text to find similarities </p>
+    <!--using TF-IDF and Cosine Similarity.-->
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="source_text">Source Text</label>
+            <textarea name="source_text" id="source_text" placeholder="Paste the original or source text here..."
+                required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="comparison_text">Comparison Text</label>
+            <textarea name="comparison_text" id="comparison_text" placeholder="Paste the text to compare here..."
+                required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Check Similarity</button>
+    </form>
+
+    {% if result %}
+    <div class="result-box">
+        <h3>Similarity Result</h3>
+        <div class="percentage-circle">{{ result.percentage }}%</div>
+        <p>Text Similarity Score</p>
+        <p style="color: var(--muted-text);">
+            {% if result.percentage > 70 %}
+            High similarity detected. Possible plagiarism.
+            {% elif result.percentage > 30 %}
+            Moderate similarity detected.
+            {% else %}
+            Low similarity. The texts are mostly unique.
+
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

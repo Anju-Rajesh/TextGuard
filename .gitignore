@@ -1,0 +1,17 @@
+# AI Models (Too large for standard GitHub)
+models/
+model.safetensors_test
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+env/
+venv/
+.env
+
+# Flask/SQLite
+instance/
+*.db

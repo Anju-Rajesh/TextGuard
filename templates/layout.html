@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Text Analysis System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand"> AI-Based Text & Plagiarism Detection System</a>
+        <ul class="navbar-nav">
+            {% if current_user.is_authenticated %}
+            <li><a href="{{ url_for('ai_detection') }}">AI Detection</a></li>
+            <li><a href="{{ url_for('similarity') }}">Similarity Check</a></li>
+            <li><a href="{{ url_for('plagiarism') }}">Plagiarism Check</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout ({{ current_user.username }})</a></li>
+            {% else %}
+            <li><a href="{{ url_for('login') }}">Login</a></li>
+            <li><a href="{{ url_for('register') }}">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+
+</html>

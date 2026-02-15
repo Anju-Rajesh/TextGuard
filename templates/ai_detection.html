@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="card">
+    <h2>AI-Generated Text Detection</h2>
+    <p style="color: var(--muted-text); margin-bottom: 2rem;">Upload a .txt file or paste your text below to analyze its
+        origin.</p>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Upload .txt File</label>
+            <input type="file" name="file" id="file" accept=".txt" style="padding: 0.5rem 0;">
+        </div>
+
+        <div class="form-group">
+            <label for="text">Or Paste Text</label>
+            <textarea name="text" id="text" placeholder="Paste your content here..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Analyze Text</button>
+    </form>
+
+    {% if result %}
+    <div class="result-box">
+        <h3>Analysis Result</h3>
+        <div class="percentage-circle">{{ result.probability }}%</div>
+        <p>AI Generation Probability</p>
+        <div class="badge {% if result.probability > 50 %}badge-ai{% else %}badge-human{% endif %}">
+            {{ result.conclusion }}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
