@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+<header style="margin-top: 5rem;">
+    <h1>Welcome <span>Back</span></h1>
+    <p>Sign in to your TextGuard AI account to access premium features.</p>
+</header>
+
+<div class="card" style="max-width: 450px; margin: 0 auto; padding: 3rem;">
+    <form method="POST">
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" name="email" id="email" required placeholder="name@company.com"
+                style="width: 100%; padding: 1rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; color: white;">
+        </div>
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required placeholder="Enter your password"
+                style="width: 100%; padding: 1rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; color: white;">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">Secure
+            Login</button>
+    </form>
+
+    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
+        <p style="color: var(--text-muted);">
+            New to TextGuard? <a href="{{ url_for('register') }}"
+                style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Create an account</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

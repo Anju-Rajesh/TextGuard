@@ -1,0 +1,15 @@
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+Flask-Bcrypt==1.0.1
+Flask-Login==0.6.3
+scikit-learn==1.4.2
+numpy==1.26.4
+requests==2.31.0
+beautifulsoup4==4.12.3
+duckduckgo-search==5.3.0
+nltk==3.8.1
+torch>=2.0.0
+transformers==4.39.0
+sentencepiece
+pandas
+sentence-transformers==2.7.0

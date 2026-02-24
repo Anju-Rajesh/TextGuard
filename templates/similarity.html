@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+{% block content %}
+<header>
+    <h1>Similarity <span>Detection</span></h1>
+    <p>Compare two pieces of text to identify overlapping content and linguistic similarities.</p>
+</header>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Text Comparison</h3>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="vertical-stack">
+            <div class="form-group">
+                <div class="form-header">
+                    <label for="source_text">Source Document (Reference)</label>
+                    <div class="upload-btn-compact" onclick="document.getElementById('source_file').click()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        <span>Upload .txt</span>
+                        <span id="sourceFilePill" class="file-name-pill"></span>
+                    </div>
+                    <input type="file" name="source_file" id="source_file" accept=".txt" style="display: none;"
+                        onchange="updateFileName(this, 'sourceFilePill')">
+                </div>
+                <textarea name="source_text" id="source_text"
+                    placeholder="Paste the original or reference document content here..." required></textarea>
+            </div>
+
+            <div class="stack-divider">
+                <div class="stack-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="7 13 12 18 17 13"></polyline>
+                        <polyline points="7 6 12 11 17 6"></polyline>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-header">
+                    <label for="comparison_text">Comparison Document (Check this)</label>
+                    <div class="upload-btn-compact" onclick="document.getElementById('comparison_file').click()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        <span>Upload .txt</span>
+                        <span id="comparisonFilePill" class="file-name-pill"></span>
+                    </div>
+                    <input type="file" name="comparison_file" id="comparison_file" accept=".txt" style="display: none;"
+                        onchange="updateFileName(this, 'comparisonFilePill')">
+                </div>
+                <textarea name="comparison_text" id="comparison_text"
+                    placeholder="Paste the text you want to check against the source here..." required></textarea>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary">Analyze Similarity</button>
+        </div>
+    </form>
+</div>
+
+{% if result %}
+<div class="card result-card">
+    <div class="result-content">
+        <div class="score-container">
+            <div class="circular-progress"
+                style="background: conic-gradient(var(--primary-color) {{ result.percentage * 3.6 }}deg, rgba(255,255,255,0.1) 0deg)">
+                <div
+                    style="position: absolute; width: 110px; height: 110px; background: var(--bg-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1;">
+                    <span>{{ result.percentage }}%</span>
+                </div>
+            </div>
+            <p style="font-weight: 600; margin-top: 0.5rem;">Similarity Score</p>
+        </div>
+
+        <div class="result-info">
+            <h2 style="margin-bottom: 0.5rem;">Comparison Results</h2>
+            <div class="badge {% if result.percentage > 70 %}badge-danger{% elif result.percentage > 30 %}badge-warning{% else %}badge-success{% endif %}"
+                style="margin-bottom: 1rem; display: inline-block;">
+                {% if result.percentage > 70 %}High Similarity{% elif result.percentage > 30 %}Moderate Similarity{%
+                else %}Unique Content{% endif %}
+            </div>
+            <p style="color: var(--text-muted);">
+                {% if result.percentage > 70 %}
+                Significant overlap has been detected between the two documents. This suggests a high probability of
+                direct copy-pasting or minimal paraphrasing.
+                {% elif result.percentage > 30 %}
+                Moderate similarity detected. Some phrases or structural elements appear similar to the source document.
+                {% else %}
+                Low similarity score. The submitted text appears to be significantly different from the source document.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+    function updateFileName(input, pillId) {
+        const pill = document.getElementById(pillId);
+        if (input.files && input.files[0]) {
+            pill.textContent = input.files[0].name;
+            pill.style.display = 'inline-block';
+
+            // Auto-fill the corresponding textarea
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const textareaId = pillId.includes('source') ? 'source_text' : 'comparison_text';
+                document.getElementById(textareaId).value = e.target.result;
+            };
+            reader.readAsText(input.files[0]);
+        } else {
+            pill.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

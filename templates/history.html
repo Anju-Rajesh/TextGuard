@@ -1,0 +1,177 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<header>
+    <h1>Audit <span>History</span></h1>
+    <p>Review your previous analysis reports. Select a category to view specific logs.</p>
+</header>
+
+<div class="filter-container" style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem;">
+    <button class="btn btn-filter active" onclick="showHistory('plagiarism', this)">Plagiarism Checks</button>
+    <button class="btn btn-filter" onclick="showHistory('similarity', this)">Similarity Checks</button>
+    <button class="btn btn-filter" onclick="showHistory('ai', this)">AI Detection</button>
+</div>
+
+<!-- Plagiarism Database Checks Section -->
+<div id="plagiarism-section" class="history-section mb-4">
+    <div class="card">
+        <div class="card-header">
+            <h3>Plagiarism Check History</h3>
+        </div>
+        {% if plagiarism_history %}
+        <div class="sources-list" style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for item in plagiarism_history %}
+            <div class="card"
+                style="padding: 1.5rem; background: rgba(255,255,255,0.03); margin-bottom: 0; border-color: rgba(255,255,255,0.05);">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="margin: 0; color: var(--text-color);">Database Plagiarism Check</h4>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">{{ item.created_at.strftime('%Y-%m-%d
+                            %H:%M') }}</span>
+                    </div>
+                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary-color);">{{
+                        item.similarity_score }}%</div>
+                </div>
+                <div style="padding: 0.75rem; background: rgba(0,0,0,0.2); border-radius: 4px; margin-bottom: 1rem;">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+                        <strong>Snippet:</strong> {{ item.suspicious_text }}
+                    </p>
+                </div>
+                <span class="badge {% if item.similarity_score > 50 %}badge-danger{% else %}badge-success{% endif %}">
+                    {{ item.plagiarism_level }} Risk
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align: center; color: var(--text-muted); padding: 2rem;">No plagiarism checks found.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Text Similarity Checks Section -->
+<div id="similarity-section" class="history-section mb-4" style="display: none;">
+    <div class="card">
+        <div class="card-header">
+            <h3>Similarity Check History</h3>
+        </div>
+        {% if similarity_history %}
+        <div class="sources-list" style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for item in similarity_history %}
+            <div class="card"
+                style="padding: 1.5rem; background: rgba(255,255,255,0.03); margin-bottom: 0; border-color: rgba(255,255,255,0.05);">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="margin: 0; color: var(--text-color);">Text Comparison (Similarity)</h4>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">{{ item.created_at.strftime('%Y-%m-%d
+                            %H:%M') }}</span>
+                    </div>
+                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary-color);">{{
+                        item.similarity_percentage }}%</div>
+                </div>
+                <div style="padding: 0.75rem; background: rgba(0,0,0,0.2); border-radius: 4px;">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+                        <strong>Comparison:</strong> {{ item.source_text[:80] }}... vs ...{{ item.comparison_text[:80]
+                        }}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align: center; color: var(--text-muted); padding: 2rem;">No similarity checks found.</p>
+        {% endif %}
+    </div>
+</div>
+
+AI Detection History Section
+<div id="ai-section" class="history-section mb-4" style="display: none;">
+    <div class="card">
+        <div class="card-header">
+            <h3>AI Detection History</h3>
+        </div>
+        {% if ai_history %}
+        <div class="sources-list" style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for item in ai_history %}
+            <div class="card"
+                style="padding: 1.5rem; background: rgba(255,255,255,0.03); margin-bottom: 0; border-color: rgba(255,255,255,0.05);">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="margin: 0; color: var(--text-color);">AI Generation Analysis</h4>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">{{ item.created_at.strftime('%Y-%m-%d
+                            %H:%M') }}</span>
+                    </div>
+                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary-color);">{{
+                        item.ai_probability }}%</div>
+                </div>
+                <div style="padding: 0.75rem; background: rgba(0,0,0,0.2); border-radius: 4px; margin-bottom: 1rem;">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+                        <strong>Snippet:</strong> {{ item.input_text }}
+                    </p>
+                </div>
+                <span class="badge {% if item.ai_probability > 50 %}badge-danger{% else %}badge-success{% endif %}">
+                    {{ item.conclusion }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align: center; color: var(--text-muted); padding: 2rem;">No AI detection checks found.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .btn-filter {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-muted);
+        padding: 0.6rem 1.5rem;
+        border-radius: 100px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-filter:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+    }
+
+    .btn-filter.active {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .mb-4 {
+        margin-bottom: 2rem;
+    }
+
+    .history-section {
+        animation: fadeIn 0.5s ease forwards;
+    }
+</style>
+
+<script>
+    function showHistory(type, btn) {
+        // Hide all sections
+        document.querySelectorAll('.history-section').forEach(section => {
+            section.style.display = 'none';
+        });
+
+        // Show selected section
+        document.getElementById(type + '-section').style.display = 'block';
+
+        // Update active button
+        document.querySelectorAll('.btn-filter').forEach(b => {
+            b.classList.remove('active');
+        });
+        btn.classList.add('active');
+    }
+</script>
+{% endblock %}

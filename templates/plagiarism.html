@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<header>
+    <h1>Plagiarism <span>Check</span></h1>
+    <p>Compare your text against our comprehensive internal database to ensure originality.</p>
+</header>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Internal Corpus Search</h3>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="corpus_check">
+
+        <div class="form-group">
+            <div class="form-header">
+                <label for="corpus_text">Database Search Content</label>
+                <div class="upload-btn-compact" onclick="document.getElementById('corpus_file').click()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    <span>Upload .txt</span>
+                    <span id="fileNamePill" class="file-name-pill"></span>
+                </div>
+                <input type="file" name="corpus_file" id="corpus_file" accept=".txt" style="display: none;"
+                    onchange="updateFileName(this)">
+            </div>
+            <textarea name="corpus_text" id="corpus_text"
+                placeholder="Paste your text here to check against the dataset..." rows="8"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Run Database Search</button>
+    </form>
+</div>
+
+{% if corpus_results %}
+<div class="card result-card">
+    <h3 style="margin-bottom: 2rem; color: var(--primary-color);">Plagiarism Analysis Report</h3>
+
+    <div class="result-content" style="margin-bottom: 3rem;">
+        <div class="score-container">
+            <div class="circular-progress"
+                style="background: conic-gradient({% if corpus_results.plagiarism_level == 'High' %}var(--danger){% elif corpus_results.plagiarism_level == 'Moderate' %}#f59e0b{% else %}var(--success){% endif %} {{ corpus_results.overall_plagiarism_percentage * 3.6 }}deg, rgba(255,255,255,0.1) 0deg)">
+                <div
+                    style="position: absolute; width: 110px; height: 110px; background: var(--bg-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1;">
+                    <span
+                        style="color: {% if corpus_results.plagiarism_level == 'High' %}var(--danger){% elif corpus_results.plagiarism_level == 'Moderate' %}#f59e0b{% else %}var(--success){% endif %};">{{
+                        corpus_results.overall_plagiarism_percentage }}%</span>
+                </div>
+            </div>
+            <p style="font-weight: 600; margin-top: 0.5rem;">Overall Plagiarism</p>
+        </div>
+
+        <div class="result-info">
+            <h2 style="margin-bottom: 0.5rem;">{{ corpus_results.plagiarism_level }} Plagiarism Level</h2>
+            <div class="badge {% if corpus_results.plagiarism_level == 'High' %}badge-danger{% elif corpus_results.plagiarism_level == 'Moderate' %}badge-warning{% else %}badge-success{% endif %}"
+                style="margin-bottom: 1rem; display: inline-block; background: {% if corpus_results.plagiarism_level == 'High' %}var(--danger){% elif corpus_results.plagiarism_level == 'Moderate' %}#f59e0b{% else %}var(--success){% endif %}; color: white;">
+                {{ corpus_results.plagiarism_level }} Risk
+            </div>
+            <p style="color: var(--text-muted);">{{ corpus_results.message }}</p>
+        </div>
+    </div>
+
+    <h4 style="margin-bottom: 1.5rem;">Matched Database Sources</h4>
+    {% if corpus_results.top_sources %}
+    <div class="sources-list" style="display: flex; flex-direction: column; gap: 1rem;">
+        {% for source in corpus_results.top_sources %}
+        {% if source.similarity > 0 %}
+        <div class="card"
+            style="padding: 1.5rem; background: rgba(255,255,255,0.03); margin-bottom: 0; border-color: rgba(255,255,255,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div>
+                    <h4 style="margin: 0; color: var(--text-color);">{{ source.source }}</h4>
+                    <span class="badge"
+                        style="font-size: 0.75rem; background: {% if source.plagiarism_level == 'High' %}rgba(239, 68, 68, 0.2){% elif source.plagiarism_level == 'Moderate' %}rgba(245, 158, 11, 0.2){% else %}rgba(16, 185, 129, 0.2){% endif %}; color: {% if source.plagiarism_level == 'High' %}#f87171{% elif source.plagiarism_level == 'Moderate' %}#fbbf24{% else %}#34d399{% endif %}; border: 1px solid currentColor;">
+                        {{ source.plagiarism_level }} Risk
+                    </span>
+                </div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary-color);">{{ source.similarity }}%
+                </div>
+            </div>
+            <div
+                style="padding: 1rem; background: rgba(0,0,0,0.2); border-left: 3px solid var(--primary-color); border-radius: 4px;">
+                <p style="font-size: 0.9rem; font-style: italic; color: var(--text-muted);">"{{ source.matched_segment
+                    }}"</p>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color: var(--text-muted);">No matching documents were found in our internal database.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<script>
+    function updateFileName(input) {
+        const pill = document.getElementById('fileNamePill');
+        if (input.files && input.files[0]) {
+            pill.textContent = input.files[0].name;
+            pill.style.display = 'inline-block';
+        } else {
+            pill.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}
