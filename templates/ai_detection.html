@@ -21,10 +21,10 @@
                         <polyline points="17 8 12 3 7 8" />
                         <line x1="12" y1="3" x2="12" y2="15" />
                     </svg>
-                    <span>Upload .txt</span>
+                    <span>Upload .txt or .pdf</span>
                     <span id="fileNamePill" class="file-name-pill"></span>
                 </div>
-                <input type="file" name="file" id="file" accept=".txt" style="display: none;"
+                <input type="file" name="file" id="file" accept=".txt,.pdf" style="display: none;"
                     onchange="updateFileName(this)">
             </div>
             <textarea name="text" id="text" placeholder="Paste your text here for deep analysis..."></textarea>
@@ -73,11 +73,3 @@
     }
 </script>
 {% endblock %}
-
-
-
-
-
-
-
-

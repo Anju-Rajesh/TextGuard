@@ -15,6 +15,7 @@ Notes:
 import math
 import random
 import torch
+import nltk
 from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
 from transformers import (
@@ -23,6 +24,13 @@ from transformers import (
     AutoTokenizer as HFTokenizer,
     AutoModelForSeq2SeqLM,
 )
+
+# Ensure NLTK data is available for burstiness analysis
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+
 
 # -----------------------------
 # Config
@@ -69,11 +77,9 @@ def compute_log_likelihood(
     stride: int = 256,
     device: str = "cpu",
 ) -> float:
-    """
-    Returns average log-likelihood per token (higher is more probable).
-    Uses sliding window for long text, similar to common perplexity scripts.
-    """
+    # ALGORITHM 1: Probability Modeling (Log-Likelihood)
     enc = tokenizer(text, return_tensors="pt")
+
     input_ids = enc["input_ids"][0].to(device)
 
     nlls = []
@@ -116,10 +122,12 @@ def compute_log_likelihood(
 
 
 def compute_perplexity_from_avg_ll(avg_ll: float) -> float:
-    # Perplexity = exp(-avg_ll)
+    # ALGORITHM 2: Perplexity Analysis
     if avg_ll == float("-inf"):
+
         return float("inf")
     return float(math.exp(-avg_ll))
+
 
 
 # -----------------------------
@@ -205,16 +213,29 @@ def t5_infill(
     return decoded
 
 
+def compute_burstiness(text: str) -> float:
+    # ALGORITHM 5: Statistical Rhythm Analysis (Burstiness)
+    sentences = nltk.sent_tokenize(text)
+
+    if len(sentences) <= 1:
+        return 0.0
+    
+    lengths = [len(s.split()) for s in sentences]
+    avg = sum(lengths) / len(lengths)
+    variance = sum((l - avg) ** 2 for l in lengths) / len(lengths)
+    return math.sqrt(variance)
+
+
+
 def make_perturbations(
     text: str,
     t5_tokenizer: HFTokenizer,
     t5_model: AutoModelForSeq2SeqLM,
     cfg: DetectConfig,
 ) -> List[str]:
-    """
-    Create N perturbations: mask some spans and infill with T5, then reconstruct.
-    """
+    # ALGORITHM 3: Perturbation Generation (Mask-and-Fill)
     words = text.split()
+
     if len(words) < 30:
         # Too short → perturbations are unstable
         return []
@@ -311,9 +332,12 @@ class PerplexityCurvatureDetector:
                 ll_perts.append(llp)
 
         if ll_perts:
+            # ALGORITHM 4: Curvature-Based Detection (DetectGPT-Inspired)
             curvature = ll_orig - (sum(ll_perts) / len(ll_perts))
+
         else:
             curvature = None
+
 
         # 3) Enhanced scoring logic
         # Curvature is our most reliable signal (DetectGPT principle)
@@ -335,12 +359,21 @@ class PerplexityCurvatureDetector:
         elif ppl < 80: ppl_signal = 40.0 # Uncertain
         else: ppl_signal = 10.0          # likely Human
 
-        # Combine: 70% Curvature, 30% Perplexity
-        score = (curv_score * 0.70) + (ppl_signal * 0.30)
+        # 3) Burstiness signal
+        burstiness = compute_burstiness(text)
+        # Higher burstiness (> 7.0) is human; lower (< 3.0) is AI-like
+        if burstiness > 7.0: burst_signal = 0.0
+        elif burstiness < 3.0: burst_signal = 80.0
+        else: burst_signal = 40.0
+
+        # ALGORITHM 6: Threshold-Based Decision Logic
+        score = (curv_score * 0.60) + (ppl_signal * 0.20) + (burst_signal * 0.20)
+
         
         # Clamp it
         score = max(0.0, min(100.0, score))
         score = round(score, 2)
+
 
         # 4) Conclusion bands
         if score >= 80:
@@ -357,7 +390,9 @@ class PerplexityCurvatureDetector:
             "masker_model": self.cfg.masker_name,
             "avg_log_likelihood": round(ll_orig, 6),
             "perplexity": round(ppl, 3),
+            "burstiness": round(burstiness, 3),
             "num_perturbations_used": len(ll_perts),
+
             "curvature": None if curvature is None else round(curvature, 6),
             "ai_score_0_100": score,
             "conclusion": conclusion,

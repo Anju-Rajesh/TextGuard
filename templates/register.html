@@ -17,9 +17,18 @@
             <input type="email" name="email" id="email" required placeholder="name@company.com"
                 style="width: 100%; padding: 1rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; color: white;">
         </div>
-        <div class="form-group" style="margin-bottom: 2rem;">
+        <div class="form-group">
             <label for="password">Password</label>
             <input type="password" name="password" id="password" required placeholder="Create a strong password"
+                style="width: 100%; padding: 1rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; color: white;">
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+                Min 8 characters, include uppercase, lowercase, number, and special character.
+            </p>
+        </div>
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" name="confirm_password" id="confirm_password" required
+                placeholder="Repeat your password"
                 style="width: 100%; padding: 1rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; color: white;">
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">Register

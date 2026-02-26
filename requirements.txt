@@ -13,3 +13,4 @@ transformers==4.39.0
 sentencepiece
 pandas
 sentence-transformers==2.7.0
+pypdf==4.1.0

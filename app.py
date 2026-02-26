@@ -1,4 +1,5 @@
 import os
+import re
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -6,6 +7,7 @@ from models import db, User, AIAnalysis, SimilarityAnalysis, PlagiarismAnalysis,
 from utils.ai_detector import analyze_text_ai
 from utils.similarity_checker import calculate_similarity, get_plagiarism_level
 from utils.plagiarism_detector import detect_plagiarism_from_corpus
+from utils.file_utils import extract_text_from_file
 
 # --- APP CONFIGURATION ---
 app = Flask(__name__)
@@ -43,13 +45,37 @@ def register():
         # return redirect(url_for('ai_detection'))
         return redirect(url_for('plagiarism'))
     if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
+        username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
         
-        user_exists = User.query.filter((User.username == username) | (User.email == email)).first()
+        # 1. Basic Length Checks
+        if len(username) < 3:
+            flash('Username must be at least 3 characters long.', 'danger')
+            return redirect(url_for('register'))
+            
+        # 2. Email Format Validation
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, email):
+            flash('Please enter a valid email address.', 'danger')
+            return redirect(url_for('register'))
+            
+        # 3. Password Complexity Validation
+        # Min 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
+        password_regex = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+        if not re.match(password_regex, password):
+            flash('Password is too weak. Must include caps, small, numbers, and special characters.', 'danger')
+            return redirect(url_for('register'))
+            
+        # 4. Password Matching
+        if password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+            return redirect(url_for('register'))
+
+        user_exists = User.query.filter_by(email=email).first()
         if user_exists:
-            flash('Username or email already exists.', 'danger')
+            flash('Email already registered. Please use a different email.', 'danger')
             return redirect(url_for('register'))
         
         # Security: Hash the password before saving
@@ -70,8 +96,8 @@ def login():
         return redirect(url_for('plagiarism'))
 
     if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
         user = User.query.filter_by(email=email).first()
         
         # Verify password against hash
@@ -80,7 +106,7 @@ def login():
             # return redirect(url_for('ai_detection'))
             return redirect(url_for('plagiarism'))
         else:
-            flash('Login unsuccessful. Please check email and password.', 'danger')
+            flash('Invalid email or password. Please try again.', 'danger')
     return render_template('login.html')
 
 @app.route('/logout')
@@ -98,10 +124,9 @@ def ai_detection():
         # Handle file upload (.txt) or direct text paste
         if 'file' in request.files and request.files['file'].filename != '':
             file = request.files['file']
-            if file.filename.endswith('.txt'):
-                text = file.read().decode('utf-8')
-            else:
-                flash('Only .txt files are allowed.', 'warning')
+            text = extract_text_from_file(file)
+            if not text:
+                flash('Only .txt and .pdf files are allowed.', 'warning')
         else:
             text = request.form.get('text', '')
 
@@ -132,18 +157,16 @@ def similarity():
         # Handle Source File
         if 'source_file' in request.files and request.files['source_file'].filename != '':
             source_file = request.files['source_file']
-            if source_file.filename.endswith('.txt'):
-                source_text = source_file.read().decode('utf-8')
-            else:
-                flash('Only .txt files are allowed for Source Document.', 'warning')
+            source_text = extract_text_from_file(source_file)
+            if not source_text:
+                flash('Only .txt and .pdf files are allowed for Source Document.', 'warning')
 
         # Handle Comparison File
         if 'comparison_file' in request.files and request.files['comparison_file'].filename != '':
             comp_file = request.files['comparison_file']
-            if comp_file.filename.endswith('.txt'):
-                comparison_text = comp_file.read().decode('utf-8')
-            else:
-                flash('Only .txt files are allowed for Comparison Document.', 'warning')
+            comparison_text = extract_text_from_file(comp_file)
+            if not comparison_text:
+                flash('Only .txt and .pdf files are allowed for Comparison Document.', 'warning')
 
         if source_text.strip() and comparison_text.strip():
             # Run Similarity Logic (TF-IDF Cosine Similarity)
@@ -181,10 +204,9 @@ def plagiarism():
 
             if 'corpus_file' in request.files and request.files['corpus_file'].filename != '':
                 file = request.files['corpus_file']
-                if file.filename.endswith('.txt'):
-                    text_to_check = file.read().decode('utf-8')
-                else:
-                    flash('Only .txt files are allowed.', 'warning')
+                text_to_check = extract_text_from_file(file)
+                if not text_to_check:
+                    flash('Only .txt and .pdf files are allowed.', 'warning')
             else:
                 text_to_check = request.form.get('corpus_text', '')
 

@@ -22,10 +22,10 @@
                             <polyline points="17 8 12 3 7 8" />
                             <line x1="12" y1="3" x2="12" y2="15" />
                         </svg>
-                        <span>Upload .txt</span>
+                        <span>Upload .txt or .pdf</span>
                         <span id="sourceFilePill" class="file-name-pill"></span>
                     </div>
-                    <input type="file" name="source_file" id="source_file" accept=".txt" style="display: none;"
+                    <input type="file" name="source_file" id="source_file" accept=".txt,.pdf" style="display: none;"
                         onchange="updateFileName(this, 'sourceFilePill')">
                 </div>
                 <textarea name="source_text" id="source_text"
@@ -52,11 +52,11 @@
                             <polyline points="17 8 12 3 7 8" />
                             <line x1="12" y1="3" x2="12" y2="15" />
                         </svg>
-                        <span>Upload .txt</span>
+                        <span>Upload .txt or .pdf</span>
                         <span id="comparisonFilePill" class="file-name-pill"></span>
                     </div>
-                    <input type="file" name="comparison_file" id="comparison_file" accept=".txt" style="display: none;"
-                        onchange="updateFileName(this, 'comparisonFilePill')">
+                    <input type="file" name="comparison_file" id="comparison_file" accept=".txt,.pdf"
+                        style="display: none;" onchange="updateFileName(this, 'comparisonFilePill')">
                 </div>
                 <textarea name="comparison_text" id="comparison_text"
                     placeholder="Paste the text you want to check against the source here..." required></textarea>
@@ -112,13 +112,21 @@
             pill.textContent = input.files[0].name;
             pill.style.display = 'inline-block';
 
-            // Auto-fill the corresponding textarea
-            const reader = new FileReader();
-            reader.onload = function (e) {
+            // Auto-fill the corresponding textarea ONLY for .txt files
+            if (input.files[0].name.toLowerCase().endsWith('.txt')) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const textareaId = pillId.includes('source') ? 'source_text' : 'comparison_text';
+                    document.getElementById(textareaId).value = e.target.result;
+                };
+                reader.readAsText(input.files[0]);
+            } else {
+                // For PDFs, we can't reliably extract text in pure frontend without a heavy library
+                // The backend will handle the extraction on submit.
                 const textareaId = pillId.includes('source') ? 'source_text' : 'comparison_text';
-                document.getElementById(textareaId).value = e.target.result;
-            };
-            reader.readAsText(input.files[0]);
+                document.getElementById(textareaId).placeholder = "PDF file selected: " + input.files[0].name + ". Text will be extracted upon analysis.";
+                document.getElementById(textareaId).required = false; // Make it not required since file is provided
+            }
         } else {
             pill.style.display = 'none';
         }

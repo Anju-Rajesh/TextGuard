@@ -24,10 +24,10 @@
                         <polyline points="17 8 12 3 7 8" />
                         <line x1="12" y1="3" x2="12" y2="15" />
                     </svg>
-                    <span>Upload .txt</span>
+                    <span>Upload .txt or .pdf</span>
                     <span id="fileNamePill" class="file-name-pill"></span>
                 </div>
-                <input type="file" name="corpus_file" id="corpus_file" accept=".txt" style="display: none;"
+                <input type="file" name="corpus_file" id="corpus_file" accept=".txt,.pdf" style="display: none;"
                     onchange="updateFileName(this)">
             </div>
             <textarea name="corpus_text" id="corpus_text"
@@ -76,10 +76,24 @@
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
                 <div>
                     <h4 style="margin: 0; color: var(--text-color);">{{ source.source }}</h4>
-                    <span class="badge"
-                        style="font-size: 0.75rem; background: {% if source.plagiarism_level == 'High' %}rgba(239, 68, 68, 0.2){% elif source.plagiarism_level == 'Moderate' %}rgba(245, 158, 11, 0.2){% else %}rgba(16, 185, 129, 0.2){% endif %}; color: {% if source.plagiarism_level == 'High' %}#f87171{% elif source.plagiarism_level == 'Moderate' %}#fbbf24{% else %}#34d399{% endif %}; border: 1px solid currentColor;">
-                        {{ source.plagiarism_level }} Risk
-                    </span>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.25rem;">
+                        <span class="badge"
+                            style="font-size: 0.75rem; background: {% if source.plagiarism_level == 'High' %}rgba(239, 68, 68, 0.2){% elif source.plagiarism_level == 'Moderate' %}rgba(245, 158, 11, 0.2){% else %}rgba(16, 185, 129, 0.2){% endif %}; color: {% if source.plagiarism_level == 'High' %}#f87171{% elif source.plagiarism_level == 'Moderate' %}#fbbf24{% else %}#34d399{% endif %}; border: 1px solid currentColor;">
+                            {{ source.plagiarism_level }} Risk
+                        </span>
+                        {% if source.source_url and source.source_url != 'nan' %}
+                        <a href="{{ source.source_url }}" target="_blank" class="badge"
+                            style="font-size: 0.75rem; background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid currentColor; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                <polyline points="15 3 21 3 21 9" />
+                                <line x1="10" y1="14" x2="21" y2="3" />
+                            </svg>
+                            View Source
+                        </a>
+                        {% endif %}
+                    </div>
                 </div>
                 <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary-color);">{{ source.similarity }}%
                 </div>

@@ -7,10 +7,9 @@ try:
 except LookupError:
     nltk.download('punkt')
 
+# ALGORITHM 2: Sliding Window Algorithm
+# Creates overlapping segments of text to catch partial and patchwork plagiarism.
 def get_sliding_windows(sentences, window_size=3):
-    """
-    Creates overlapping segments of text (sliding windows) from a list of sentences.
-    """
     if len(sentences) <= window_size:
         return [" ".join(sentences)]
     
@@ -35,7 +34,8 @@ def detect_plagiarism_from_corpus(input_text):
         result['message'] = "Input text is empty."
         return result
 
-    # Split input into sentences
+    # ALGORITHM 1: NLTK Punkt Tokenizer
+    # Splits the raw input into logical sentences using unsupervised statistical rules.
     sentences = nltk.sent_tokenize(input_text)
     if not sentences:
         sentences = [input_text]
@@ -55,8 +55,8 @@ def detect_plagiarism_from_corpus(input_text):
     unique_sources = {}
     highest_score = 0.0
 
-    # Check each window against the dataset
-    # Note: In a production system, we would batch encode these windows for performance
+    # ALGORITHM 3: Transformer-Based Semantic Encoding (all-MiniLM-L6-v2)
+    # Uses SBERT (Sentence-BERT) to convert text into mathematical meaning.
     for window in windows:
         # Search dataset
         matches = search_dataset(window, top_k=1)
@@ -74,6 +74,7 @@ def detect_plagiarism_from_corpus(input_text):
                 if source_title not in unique_sources:
                     unique_sources[source_title] = {
                         'max_score': score,
+                        'source_url': match.get('source_url', ''),
                         'matched_segments': []
                     }
                 else:
@@ -96,11 +97,14 @@ def detect_plagiarism_from_corpus(input_text):
         
         sim_percent = round(data['max_score'] * 100, 2)
         
-        level = 'Low'
+        # ALGORITHM 6: Threshold-Based Classification
+        # Categorizes plagiarism risk level (High/Moderate/Low) based on similarity percentage.
         if sim_percent > 80:
             level = 'High'
         elif sim_percent > 50:
             level = 'Moderate'
+        else:
+            level = 'Low'
             
         # Get one representative segment
         best_segment = data['matched_segments'][0] if data['matched_segments'] else ""
@@ -109,6 +113,7 @@ def detect_plagiarism_from_corpus(input_text):
             'source': title,
             'similarity': sim_percent,
             'plagiarism_level': level,
+            'source_url': data.get('source_url', ''),
             'matched_segment': best_segment
         })
         

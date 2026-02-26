@@ -19,6 +19,9 @@ def get_model():
     """Lazy load the model."""
     global _model
     if _model is None:
+        # ALGORITHM 3: Transformer-Based Semantic Encoding (all-MiniLM-L6-v2)
+        # Type: SBERT (Sentence-BERT) 
+        # Converts text into a 384-dimensional vector representing its semantic meaning.
         print("Loading SentenceTransformer model...")
         _model = SentenceTransformer('all-MiniLM-L6-v2')
     return _model
@@ -33,7 +36,7 @@ def reload_dataset():
 def _load_and_normalize(path, sample=None):
     """
     Load a CSV and normalize it to a standard format with columns:
-    source_id, source_title, content
+    source_id, source_title, content, source_url
     """
     try:
         df = pd.read_csv(path, encoding='utf-8')
@@ -53,7 +56,8 @@ def _load_and_normalize(path, sample=None):
         df = pd.DataFrame({
             'source_id': df.index.astype(str),
             'source_title': df['Title'].astype(str) + ' (' + df['Release Year'].astype(str) + ')',
-            'content': df['Plot'].astype(str)
+            'content': df['Plot'].astype(str),
+            'source_url': df['Wiki Page'].astype(str)
         })
     else:
         print(f"Unknown CSV schema. Columns found: {list(df.columns)}")
@@ -118,7 +122,8 @@ def search_dataset(query_text, top_k=3):
     # Create embedding for query
     query_embedding = model.encode(query_text, convert_to_tensor=True)
 
-    # Compute cosine similarities
+    # ALGORITHM 4: Cosine Similarity Algorithm
+    # Calculates the angle between vectors to measure closeness of meaning.
     cosine_scores = util.cos_sim(query_embedding, dataset_embeddings)[0]
 
     # Find top K results
@@ -126,6 +131,8 @@ def search_dataset(query_text, top_k=3):
     if k == 0:
         return []
 
+    # ALGORITHM 5: Top-K Retrieval Algorithm
+    # Ranks and selects the most relevant documents based on highest similarity scores.
     top_results = torch.topk(cosine_scores, k=k)
 
     results = []
@@ -141,6 +148,7 @@ def search_dataset(query_text, top_k=3):
             'source_title': str(df.iloc[idx].get('source_title', 'Unknown Source')),
             'content': str(df.iloc[idx]['content']),
             'id': str(df.iloc[idx].get('source_id', idx)),
+            'source_url': str(df.iloc[idx].get('source_url', '')),
             'score': score
         })
 
