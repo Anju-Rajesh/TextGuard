@@ -1,4 +1,4 @@
-<!-- # AI Detection Evaluation Report
+# AI Detection Evaluation Report
 Created: 2026-03-13
 
 ## Summary
@@ -31,4 +31,4 @@ Created: 2026-03-13
 3. **Thresholding:** Currently using a curvature-dominant scoring model. The 83.33% accuracy is a solid baseline for the `distilgpt2` + `t5-small` architecture.
 
 ## Calibration for Future
-To increase AI sensitivity, consider adjusting `curvature_ai_threshold` in `utils/ai_detector.py` from `1.0` to `0.85`. -->
+To increase AI sensitivity, consider adjusting `curvature_ai_threshold` in `utils/ai_detector.py` from `1.0` to `0.85`.
