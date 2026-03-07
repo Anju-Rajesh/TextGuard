@@ -133,7 +133,7 @@ def ai_detection():
         if text.strip():
             # Run the AI Detection Logic (from utils/ai_detector.py)
             probability, conclusion = analyze_text_ai(text)
-            
+                  
             # Save results to database linked to current user
             analysis = AIAnalysis(user_id=current_user.id, input_text=text[:500] + '...', ai_probability=probability, conclusion=conclusion)
             db.session.add(analysis)
@@ -187,7 +187,6 @@ def similarity():
             flash('Please provide both source and comparison text (or upload files).', 'info')
 
     return render_template('similarity.html', result=result)
-
 
 @app.route('/plagiarism', methods=['GET', 'POST'])
 @login_required
@@ -256,6 +255,9 @@ def history():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
 
 
 
