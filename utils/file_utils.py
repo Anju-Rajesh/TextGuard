@@ -30,3 +30,4 @@ def extract_text_from_file(file):
             return None
             
     return None
+

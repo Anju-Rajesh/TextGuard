@@ -132,8 +132,3 @@ def detect_plagiarism_from_corpus(input_text):
 
 
 
-
-
-
-
-
