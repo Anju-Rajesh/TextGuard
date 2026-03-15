@@ -133,3 +133,6 @@ def run_bulk_plagiarism_test(num_samples=100):
 if __name__ == "__main__":
     # The user asked for a 20 test cases for all
     run_bulk_plagiarism_test(num_samples=20)
+
+
+

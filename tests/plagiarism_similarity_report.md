@@ -59,3 +59,5 @@ This test evaluates the accuracy of the system across a larger scale batch. A te
 ## 4. Improvements Implemented
 - **Bug Fix:** Fixed an `UnboundLocalError` in `plagiarism_detector.py` where the `level` variable was not defined for low-similarity matches (<50%).
 - **Stability:** Added a fallback default `level = 'Low'` to ensure the system never crashes during evaluation.
+
+
